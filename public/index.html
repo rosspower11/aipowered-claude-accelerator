@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding | Master Claude in 6 Weeks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0A0A0A;
+      --bg-card: rgba(255,255,255,0.03);
+      --bg-card-hover: rgba(255,255,255,0.055);
+      --bg-selected: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.14);
+      --border-selected: rgba(255,255,255,0.25);
+      --text: #FFFFFF;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-muted: rgba(255,255,255,0.3);
+      --accent: #FFFFFF;
+      --success: #4ADE80;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Header */
+    .header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-logo {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-logo .x {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.75rem;
+    }
+    .header-logo .claude-mark {
+      color: #E8A87C;
+      font-size: 1rem;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      min-height: calc(100vh - 73px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      position: sticky; top: 0; z-index: 10;
+      padding: 20px 0 28px;
+      background: linear-gradient(to bottom, var(--bg) 70%, transparent);
+      display: none;
+    }
+    .progress-bar-bg {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--text);
+      border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 12px;
+    }
+    .progress-step {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .progress-pct {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Steps */
+    .step {
+      display: none;
+      animation: fadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      flex: 1;
+      flex-direction: column;
+    }
+    .step.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Typography */
+    .step-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .step-title {
+      font-size: clamp(1.6rem, 3.5vw, 2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .step-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 36px;
+      max-width: 520px;
+      font-weight: 400;
+    }
+
+    /* Option cards */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .option-card {
+      position: relative;
+      padding: 16px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      user-select: none;
+    }
+    .option-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+    }
+    .option-card.selected {
+      background: var(--bg-selected);
+      border-color: var(--border-selected);
+    }
+    .option-card input { display: none; }
+
+    .option-check {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      margin-top: 2px;
+    }
+    .option-card.radio .option-check { border-radius: 50%; }
+    .option-card.selected .option-check {
+      background: var(--text);
+      border-color: var(--text);
+    }
+    .option-check svg {
+      width: 12px; height: 12px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.15s ease;
+      color: var(--bg);
+    }
+    .option-card.selected .option-check svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .option-content { flex: 1; }
+    .option-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 2px;
+      color: var(--text);
+    }
+    .option-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Textarea & inputs */
+    .input-wrap { margin-bottom: 24px; }
+    .input-wrap label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    textarea, input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      resize: none;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    textarea:focus, input[type="text"]:focus, input[type="email"]:focus {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.04);
+    }
+    textarea::placeholder, input::placeholder {
+      color: var(--text-muted);
+    }
+    textarea { min-height: 120px; }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Template textarea */
+    .template-textarea {
+      min-height: 260px;
+      line-height: 1.8;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 20px;
+    }
+    .btn {
+      padding: 13px 28px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      outline: none;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .btn-primary:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      color: var(--text-secondary);
+      border-color: var(--border-hover);
+    }
+    .btn-large {
+      padding: 16px 44px;
+      font-size: 0.85rem;
+      border-radius: var(--radius);
+      letter-spacing: 0.08em;
+    }
+
+    /* Welcome */
+    .welcome-content {
+      text-align: left;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0;
+    }
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .welcome-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+    .welcome-title {
+      font-size: clamp(2rem, 5.5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .welcome-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 480px;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+    .welcome-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Thank you */
+    .thankyou-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0;
+    }
+    .thankyou-check {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .thankyou-check svg { width: 24px; height: 24px; color: var(--success); }
+
+    .thankyou-card {
+      padding: 20px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      max-width: 440px;
+      margin-top: 32px;
+    }
+    .thankyou-card-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .thankyou-card-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Validation */
+    .field-error {
+      font-size: 0.75rem;
+      color: #F87171;
+      margin-top: 6px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(10,10,10,0.2);
+      border-top-color: var(--bg);
+      border-radius: 50%;
+      animation: spin 0.5s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      .container { padding: 0 16px 48px; }
+      .header { padding: 18px 16px; }
+      .btn-row { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+      .welcome-content { padding: 40px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    ai powered <span class="x">x</span> <span class="claude-mark">&#10040;</span> Claude
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="progress-meta">
+      <span class="progress-step" id="progressLabel">Question 1 of 6</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+  </div>
+
+  <!-- STEP 0: Welcome -->
+  <div class="step active" id="step-0">
+    <div class="welcome-content">
+      <div class="welcome-badge">
+        <span class="dot"></span>
+        Cohort 1 — Onboarding
+      </div>
+      <h1 class="welcome-title">BEFORE WE START.<br>LET'S UNDERSTAND<br>WHERE YOU ARE.</h1>
+      <p class="welcome-desc">
+        Your answers shape the experience we build together over the next 6 weeks.
+        There are no wrong answers. Just be honest about where you're starting from.
+      </p>
+      <button class="btn btn-primary btn-large" onclick="startSurvey()">
+        LET'S GO &rarr;
+      </button>
+      <div class="welcome-meta">
+        Takes about 4 minutes
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Claude Experience -->
+  <div class="step" id="step-1">
+    <div class="step-label">Question 1 of 6</div>
+    <h2 class="step-title">WHAT HAVE YOU DONE WITH CLAUDE SO FAR?</h2>
+    <p class="step-subtitle">Select everything that applies. We're mapping your starting point.</p>
+
+    <div class="options-grid" id="q1-options">
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="never_used">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">I haven't used Claude yet</div>
+          <div class="option-desc">Completely new — excited to start</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="basic_chat">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Basic chat conversations</div>
+          <div class="option-desc">Asked questions, got answers, copy-pasted outputs</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="projects">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Used Projects</div>
+          <div class="option-desc">Set up a Claude project with custom instructions or knowledge</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="artifacts">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Created Artifacts</div>
+          <div class="option-desc">Generated documents, code, visualisations, or interactive content</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="landing_page">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Built a landing page or website</div>
+          <div class="option-desc">Used Claude to generate and deploy a real web page</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="cowork">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Used Cowork mode</div>
+          <div class="option-desc">Worked with Claude's desktop tool for files, documents, and automations</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="claude_code">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Used Claude Code</div>
+          <div class="option-desc">Worked with the CLI tool for agentic coding</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="mcp_skills">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Set up MCP integrations or skills</div>
+          <div class="option-desc">Connected Claude to external tools or built custom skills</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="claude_exp" value="api">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Used the Claude API</div>
+          <div class="option-desc">Built apps or automations using the Anthropic API</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q1" onclick="goNext()">CONTINUE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: AI Journey -->
+  <div class="step" id="step-2">
+    <div class="step-label">Question 2 of 6</div>
+    <h2 class="step-title">WHERE ARE YOU ON YOUR AI JOURNEY?</h2>
+    <p class="step-subtitle">Beyond Claude specifically — how are you using AI tools in general right now?</p>
+
+    <div class="options-grid" id="q2-options">
+      <label class="option-card radio" onclick="selectRadio(this, 'q2-options')">
+        <input type="radio" name="ai_journey" value="curious_beginner">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Curious Beginner</div>
+          <div class="option-desc">I've heard the hype and tried a few things, but AI hasn't really changed how I work yet</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q2-options')">
+        <input type="radio" name="ai_journey" value="casual_user">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Casual User</div>
+          <div class="option-desc">I use ChatGPT or similar for brainstorming, writing, and Q&A — mostly chat and copy-paste</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q2-options')">
+        <input type="radio" name="ai_journey" value="active_builder">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Active Builder</div>
+          <div class="option-desc">I generate full documents, presentations, or landing pages — AI is a real part of my workflow</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q2-options')">
+        <input type="radio" name="ai_journey" value="power_user">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Power User</div>
+          <div class="option-desc">I've set up automations, integrations, and end-to-end workflows — AI is embedded in how I operate</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q2" onclick="goNext()" disabled>CONTINUE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Professional Background -->
+  <div class="step" id="step-3">
+    <div class="step-label">Question 3 of 6</div>
+    <h2 class="step-title">WHICH BEST DESCRIBES YOU RIGHT NOW?</h2>
+    <p class="step-subtitle">This helps us tailor examples and use cases to your world.</p>
+
+    <div class="options-grid" id="q3-options">
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="leadership">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Employed in a leadership position</div>
+          <div class="option-desc">C-suite, VP, Director, Head of — leading teams and strategy</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="mid_level">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Employed in a mid-level position</div>
+          <div class="option-desc">Manager, specialist, or individual contributor growing in my career</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="new_business">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Self-employed / early-stage business</div>
+          <div class="option-desc">Just getting started, building something new, finding my footing</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="established_founder">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Founder with an established business</div>
+          <div class="option-desc">Running a business with consistent revenue for multiple years</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="student_learner">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Student or career changer</div>
+          <div class="option-desc">Learning, upskilling, or pivoting into a new direction</div>
+        </div>
+      </label>
+      <label class="option-card radio" onclick="selectRadio(this, 'q3-options')">
+        <input type="radio" name="background" value="between_roles">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Currently between roles</div>
+          <div class="option-desc">Taking a break, in transition, or exploring what's next</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q3" onclick="goNext()" disabled>CONTINUE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Definition of Success -->
+  <div class="step" id="step-4">
+    <div class="step-label">Question 4 of 6</div>
+    <h2 class="step-title">WHAT DOES SUCCESS LOOK LIKE FOR YOU?</h2>
+    <p class="step-subtitle">At the end of these 6 weeks, what would make you think "that was absolutely worth it"? Pick the goals that matter most, then tell us in your own words.</p>
+
+    <div class="options-grid" id="q4-options">
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="build_things">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Build real things with AI</div>
+          <div class="option-desc">Websites, apps, tools, landing pages — not just chat outputs</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="save_time">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Save hours every week</div>
+          <div class="option-desc">Automate repetitive work and free up time for what matters</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="confidence">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Feel confident using Claude for anything</div>
+          <div class="option-desc">Know what's possible and how to get there — no more guessing</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="launch_faster">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Launch a product or service faster</div>
+          <div class="option-desc">Use AI to go from idea to live in days, not months</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="automate_workflows">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Set up end-to-end automations</div>
+          <div class="option-desc">Build systems that run without you touching them</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="success_goals" value="generate_revenue">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Generate revenue using AI</div>
+          <div class="option-desc">Monetise my AI skills — sell services, products, or consulting</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="input-wrap">
+      <label>In your own words — what would make these 6 weeks a win?</label>
+      <textarea id="success-text" placeholder="Be as specific as you can. What will you have built, changed, or achieved?" oninput="updateCharCount(this, 'success-count'); validateStep4()" maxlength="1000"></textarea>
+      <div class="char-count" id="success-count">0 / 1,000</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q4" onclick="goNext()" disabled>CONTINUE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Challenges -->
+  <div class="step" id="step-5">
+    <div class="step-label">Question 5 of 6</div>
+    <h2 class="step-title">WHAT FRUSTRATES OR CONFUSES YOU MOST ABOUT AI?</h2>
+    <p class="step-subtitle">Select everything that resonates. This tells us where to focus.</p>
+
+    <div class="options-grid" id="q5-options">
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="inconsistent_outputs">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Inconsistent or mediocre outputs</div>
+          <div class="option-desc">Sometimes it's great, sometimes it's useless — I can't reliably get quality</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="dont_know_whats_possible">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">I don't know what's actually possible</div>
+          <div class="option-desc">I feel like I'm scratching the surface but don't know what else to try</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="prompting">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">I struggle with prompting</div>
+          <div class="option-desc">I don't know how to ask for what I want in a way that gets great results</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="technical_barrier">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">The technical stuff feels overwhelming</div>
+          <div class="option-desc">APIs, code, integrations — it feels like a wall I can't climb</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="no_time">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">I don't have time to figure it all out</div>
+          <div class="option-desc">Too many tools, too many updates, not enough hours in the day</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="business_outcomes">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Connecting AI to real business outcomes</div>
+          <div class="option-desc">I can play with it, but I struggle to make it actually move the needle</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="keeping_up">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">Keeping up with the pace of change</div>
+          <div class="option-desc">New models, new features, new tools every week — it creates paralysis</div>
+        </div>
+      </label>
+      <label class="option-card" onclick="toggleOption(this)">
+        <input type="checkbox" name="challenges" value="trust">
+        <div class="option-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="option-content">
+          <div class="option-title">I don't fully trust the outputs</div>
+          <div class="option-desc">I spend too long checking and second-guessing what AI produces</div>
+        </div>
+      </label>
+    </div>
+
+    <div class="input-wrap">
+      <label>Anything else holding you back?</label>
+      <textarea id="challenges-other" placeholder="Optional — tell us anything else on your mind..." rows="3" style="min-height: 72px;" oninput="updateCharCount(this, 'challenges-count')" maxlength="500"></textarea>
+      <div class="char-count" id="challenges-count">0 / 500</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q5" onclick="goNext()">CONTINUE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: Introduce Yourself -->
+  <div class="step" id="step-6">
+    <div class="step-label">Question 6 of 6</div>
+    <h2 class="step-title">INTRODUCE YOURSELF TO THE COHORT.</h2>
+    <p class="step-subtitle">We'll share these intros with the group before we kick off so everyone arrives already connected. Edit the template below and make it yours.</p>
+
+    <div class="input-wrap">
+      <textarea id="intro-text" class="template-textarea" oninput="updateCharCount(this, 'intro-count'); validateIntro()" maxlength="2000">I'm [your name], and I [what you do for work].
+
+I joined this accelerator because [why you're here].
+
+What excites me most about AI is [what gets you fired up].
+
+What makes me nervous is [what feels uncertain or daunting].
+
+Outside of work, I enjoy [something personal — hobby, passion, obsession].
+
+A country I haven't been to but would love to visit is [dream destination].
+
+I'd love to connect with anyone who [partnership or collaboration you're open to].</textarea>
+      <div class="char-count" id="intro-count">0 / 2,000</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-q6" onclick="goNext()">ALMOST DONE &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 7: Contact Info -->
+  <div class="step" id="step-7">
+    <div class="step-label">Final Step</div>
+    <h2 class="step-title">LET'S MAKE IT OFFICIAL.</h2>
+    <p class="step-subtitle">Enter your details so we can personalise your accelerator experience and send you your results.</p>
+
+    <div class="input-wrap">
+      <label>Your name</label>
+      <input type="text" id="user-name" placeholder="First and last name" oninput="validateContact()">
+    </div>
+
+    <div class="input-wrap">
+      <label>Your email</label>
+      <input type="email" id="user-email" placeholder="you@example.com" oninput="validateContact()">
+      <div class="field-error" id="email-error">Please enter a valid email address</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">BACK</button>
+      <button class="btn btn-primary" id="btn-submit" onclick="submitSurvey()" disabled>
+        SUBMIT MY ANSWERS &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 8: Thank You -->
+  <div class="step" id="step-8">
+    <div class="thankyou-content">
+      <div class="thankyou-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="welcome-title" style="font-size: clamp(1.8rem, 4vw, 2.4rem);">YOU'RE ALL SET.</h2>
+      <p class="welcome-desc">
+        Thank you for taking the time. Your answers help us build an accelerator that actually works for you.
+      </p>
+      <div class="thankyou-card">
+        <div class="thankyou-card-label">What happens next</div>
+        <div class="thankyou-card-text">
+          We review every response personally. You'll receive onboarding details and your cohort intro before we kick off. Keep an eye on your inbox.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentStep = 0;
+  const totalQuestions = 6;
+
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const step = document.getElementById('step-' + n);
+    if (step) {
+      step.classList.add('active');
+      step.style.animation = 'none';
+      step.offsetHeight;
+      step.style.animation = '';
+    }
+    const prog = document.getElementById('progressWrap');
+    if (n === 0 || n === 8) {
+      prog.style.display = 'none';
+    } else {
+      prog.style.display = 'block';
+      const qNum = Math.min(n, totalQuestions);
+      const pct = Math.round(((qNum - 1) / totalQuestions) * 100);
+      document.getElementById('progressFill').style.width = (n === 7 ? 100 : pct) + '%';
+      document.getElementById('progressPct').textContent = (n === 7 ? 100 : pct) + '%';
+      if (n <= totalQuestions) {
+        document.getElementById('progressLabel').textContent = 'Question ' + n + ' of ' + totalQuestions;
+      } else {
+        document.getElementById('progressLabel').textContent = 'Final step';
+      }
+    }
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function startSurvey() { showStep(1); }
+  function goNext() { showStep(currentStep + 1); }
+  function goBack() { showStep(currentStep - 1); }
+
+  // Multi-select
+  function toggleOption(card) {
+    const input = card.querySelector('input[type="checkbox"]');
+    if (!input) return;
+    const willCheck = !input.checked;
+    const name = input.name;
+
+    if (willCheck && input.value === 'never_used') {
+      card.closest('.options-grid').querySelectorAll('.option-card').forEach(c => {
+        if (c !== card) { c.classList.remove('selected'); c.querySelector('input').checked = false; }
+      });
+    } else if (willCheck && name === 'claude_exp') {
+      const neverCard = card.closest('.options-grid').querySelector('input[value="never_used"]');
+      if (neverCard && neverCard.checked) {
+        neverCard.checked = false;
+        neverCard.closest('.option-card').classList.remove('selected');
+      }
+    }
+
+    input.checked = willCheck;
+    card.classList.toggle('selected', willCheck);
+  }
+
+  // Radio
+  function selectRadio(card, gridId) {
+    const grid = document.getElementById(gridId);
+    grid.querySelectorAll('.option-card').forEach(c => {
+      c.classList.remove('selected');
+      const r = c.querySelector('input[type="radio"]');
+      if (r) r.checked = false;
+    });
+    card.classList.add('selected');
+    card.querySelector('input[type="radio"]').checked = true;
+    if (gridId === 'q2-options') document.getElementById('btn-q2').disabled = false;
+    if (gridId === 'q3-options') document.getElementById('btn-q3').disabled = false;
+  }
+
+  // Textarea
+  function updateCharCount(el, countId) {
+    document.getElementById(countId).textContent = el.value.length.toLocaleString() + ' / ' + Number(el.maxLength).toLocaleString();
+  }
+
+  function validateStep4() {
+    const anyGoalSelected = document.querySelectorAll('input[name="success_goals"]:checked').length > 0;
+    const hasText = document.getElementById('success-text').value.trim().length >= 10;
+    document.getElementById('btn-q4').disabled = !(anyGoalSelected || hasText);
+  }
+
+  function validateIntro() {
+    // Always enabled — template pre-fills
+  }
+
+  // Contact
+  function validateContact() {
+    const name = document.getElementById('user-name').value.trim();
+    const email = document.getElementById('user-email').value.trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    document.getElementById('email-error').classList.toggle('show', email.length > 0 && !emailValid);
+    document.getElementById('btn-submit').disabled = !(name.length >= 2 && emailValid);
+  }
+
+  // Init char count for intro template
+  document.addEventListener('DOMContentLoaded', () => {
+    const intro = document.getElementById('intro-text');
+    updateCharCount(intro, 'intro-count');
+  });
+
+  // Submit
+  async function submitSurvey() {
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>SUBMITTING...';
+
+    const data = {
+      claude_experience: Array.from(document.querySelectorAll('input[name="claude_exp"]:checked')).map(i => i.value),
+      ai_journey: document.querySelector('input[name="ai_journey"]:checked')?.value || '',
+      background: document.querySelector('input[name="background"]:checked')?.value || '',
+      success_goals: Array.from(document.querySelectorAll('input[name="success_goals"]:checked')).map(i => i.value),
+      success_text: document.getElementById('success-text').value.trim(),
+      challenges: Array.from(document.querySelectorAll('input[name="challenges"]:checked')).map(i => i.value),
+      challenges_other: document.getElementById('challenges-other').value.trim(),
+      cohort_intro: document.getElementById('intro-text').value.trim(),
+      name: document.getElementById('user-name').value.trim(),
+      email: document.getElementById('user-email').value.trim(),
+      submitted_at: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Submission failed');
+      showStep(8);
+    } catch (err) {
+      console.error('Submission error:', err);
+      console.log('Survey data:', JSON.stringify(data, null, 2));
+      showStep(8);
+    }
+  }
+</script>
+</body>
+</html>
