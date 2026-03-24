@@ -3,5 +3,10 @@
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/submit", "destination": "/api/submit" }
-  ]
+  ],
+  "functions": {
+    "api/submit.js": {
+      "maxDuration": 30
+    }
+  }
 }
