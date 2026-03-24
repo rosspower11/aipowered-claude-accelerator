@@ -1,7 +1,14 @@
-// Vercel Serverless Function — writes survey responses to Notion
+// Vercel Serverless Function — writes survey responses to Notion + uploads photo to R2
 // Environment variables needed:
-//   NOTION_API_KEY  — Internal integration token from https://www.notion.so/my-integrations
-//   NOTION_DB_ID    — The database ID (already set below as default)
+//   NOTION_API_KEY       — Internal integration token
+//   NOTION_DB_ID         — Database ID (defaults below)
+//   R2_ACCESS_KEY_ID     — Cloudflare R2 S3 access key
+//   R2_SECRET_ACCESS_KEY — Cloudflare R2 S3 secret key
+//   R2_ENDPOINT          — e.g. https://<account>.r2.cloudflarestorage.com
+//   R2_BUCKET            — Bucket name
+//   R2_PUBLIC_URL        — Public URL for the bucket
+
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 const NOTION_API = 'https://api.notion.com/v1/pages';
 const NOTION_VERSION = '2022-06-28';
@@ -55,6 +62,50 @@ const CHALLENGES_MAP = {
   trust: 'Trust Issues',
 };
 
+// Upload photo to R2 and return public URL
+async function uploadPhotoToR2(base64Data, fileName) {
+  const R2_KEY = process.env.R2_ACCESS_KEY_ID;
+  const R2_SECRET = process.env.R2_SECRET_ACCESS_KEY;
+  const R2_ENDPOINT = process.env.R2_ENDPOINT || 'https://771920261d26e18a3cda9f616a3c6508.r2.cloudflarestorage.com';
+  const R2_BUCKET = process.env.R2_BUCKET || 'aipowered';
+  const R2_PUBLIC = process.env.R2_PUBLIC_URL || 'https://pub-557b5f7935344f8e91f1d0f115f8ec73.r2.dev';
+
+  if (!R2_KEY || !R2_SECRET) {
+    console.error('R2 credentials not set');
+    return null;
+  }
+
+  try {
+    // Strip data URL prefix if present
+    const base64Clean = base64Data.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Clean, 'base64');
+
+    const s3 = new S3Client({
+      region: 'auto',
+      endpoint: R2_ENDPOINT,
+      credentials: {
+        accessKeyId: R2_KEY,
+        secretAccessKey: R2_SECRET,
+      },
+    });
+
+    const key = `member-photos/${fileName}`;
+
+    await s3.send(new PutObjectCommand({
+      Bucket: R2_BUCKET,
+      Key: key,
+      Body: buffer,
+      ContentType: 'image/jpeg',
+      CacheControl: 'public, max-age=31536000',
+    }));
+
+    return `${R2_PUBLIC}/${key}`;
+  } catch (err) {
+    console.error('R2 upload error:', err);
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -80,6 +131,15 @@ export default async function handler(req, res) {
   try {
     const data = req.body;
 
+    // Upload photo to R2 if provided
+    let photoUrl = null;
+    if (data.photo) {
+      const slug = (data.name || 'anon').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      const fileName = `${Date.now()}-${slug}.jpg`;
+      photoUrl = await uploadPhotoToR2(data.photo, fileName);
+    }
+
+    // Build Notion page properties
     const properties = {
       Name: {
         title: [{ text: { content: data.name || 'Anonymous' } }],
@@ -129,6 +189,14 @@ export default async function handler(req, res) {
       },
     };
 
+    // Add photo URL if uploaded successfully
+    if (photoUrl) {
+      properties['Profile Photo'] = {
+        url: photoUrl,
+      };
+    }
+
+    // Remove null selects
     if (!properties['AI Journey'].select) delete properties['AI Journey'];
     if (!properties['Background'].select) delete properties['Background'];
 
@@ -151,7 +219,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to save response' });
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, photoUrl });
   } catch (err) {
     console.error('Handler error:', err);
     return res.status(500).json({ error: 'Internal server error' });
