@@ -75,6 +75,7 @@ const INDUSTRY_MAP = {
   legal: 'Legal',
   nonprofit: 'Non-profit / Government',
 };
+
 // Upload photo to R2 and return public URL
 async function uploadPhotoToR2(base64Data, fileName) {
   const R2_KEY = process.env.R2_ACCESS_KEY_ID;
@@ -151,13 +152,19 @@ export default async function handler(req, res) {
       const fileName = `${Date.now()}-${slug}.jpg`;
       photoUrl = await uploadPhotoToR2(data.photo, fileName);
     }
+
     // Build Notion page properties
+    const COHORT = 'Cohort 1';
+
     const properties = {
       Name: {
         title: [{ text: { content: data.name || 'Anonymous' } }],
       },
       Email: {
         email: data.email || null,
+      },
+      Cohort: {
+        select: { name: COHORT },
       },
       'Claude Experience': {
         multi_select: (data.claude_experience || [])
@@ -200,6 +207,7 @@ export default async function handler(req, res) {
         date: { start: data.submitted_at || new Date().toISOString() },
       },
     };
+
     // Industry (select or rich_text for "other")
     const industryVal = data.industry || '';
     if (industryVal.startsWith('other: ')) {
