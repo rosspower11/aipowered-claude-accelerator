@@ -208,25 +208,32 @@ export default async function handler(req, res) {
       },
     };
 
-    // Industry (select or rich_text for "other")
-    const industryVal = data.industry || '';
-    if (industryVal.startsWith('other: ')) {
+    // Industry (multi-select stored as comma-joined text)
+    const industryRaw = data.industry || '';
+    if (industryRaw) {
+      const parts = industryRaw.split(', ');
+      const mapped = parts.map((v) => {
+        if (v.startsWith('not_listed: ')) return v.replace('not_listed: ', '');
+        if (v === 'not_listed') return 'Not Listed';
+        return INDUSTRY_MAP[v] || v;
+      });
       properties['Industry'] = {
-        select: { name: 'Other' },
+        rich_text: [{ text: { content: mapped.join(', ') } }],
       };
-      properties['Industry Other'] = {
-        rich_text: [{ text: { content: industryVal.replace('other: ', '') } }],
-      };
-    } else if (INDUSTRY_MAP[industryVal]) {
-      properties['Industry'] = {
-        select: { name: INDUSTRY_MAP[industryVal] },
-      };
+      // Store custom entry separately too
+      const custom = parts.find((v) => v.startsWith('not_listed: '));
+      if (custom) {
+        properties['Industry Other'] = {
+          rich_text: [{ text: { content: custom.replace('not_listed: ', '') } }],
+        };
+      }
     }
 
     // Communication preference
-    if (data.comm_preference) {
+    const COMM_MAP = { whatsapp: 'WhatsApp', slack: 'Slack', no_preference: 'No Preference' };
+    if (data.comm_preference && COMM_MAP[data.comm_preference]) {
       properties['Comm Preference'] = {
-        select: { name: data.comm_preference === 'whatsapp' ? 'WhatsApp' : 'Slack' },
+        select: { name: COMM_MAP[data.comm_preference] },
       };
     }
 
