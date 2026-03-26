@@ -62,6 +62,19 @@ const CHALLENGES_MAP = {
   trust: 'Trust Issues',
 };
 
+const INDUSTRY_MAP = {
+  technology: 'Technology / Software',
+  finance: 'Finance / Banking',
+  healthcare: 'Healthcare / Wellness',
+  education: 'Education / Training',
+  marketing: 'Marketing / Advertising',
+  real_estate: 'Real Estate / Property',
+  consulting: 'Consulting / Professional Services',
+  ecommerce: 'Retail / E-commerce',
+  media: 'Media / Entertainment / Creative',
+  legal: 'Legal',
+  nonprofit: 'Non-profit / Government',
+};
 // Upload photo to R2 and return public URL
 async function uploadPhotoToR2(base64Data, fileName) {
   const R2_KEY = process.env.R2_ACCESS_KEY_ID;
@@ -138,7 +151,6 @@ export default async function handler(req, res) {
       const fileName = `${Date.now()}-${slug}.jpg`;
       photoUrl = await uploadPhotoToR2(data.photo, fileName);
     }
-
     // Build Notion page properties
     const properties = {
       Name: {
@@ -188,6 +200,45 @@ export default async function handler(req, res) {
         date: { start: data.submitted_at || new Date().toISOString() },
       },
     };
+    // Industry (select or rich_text for "other")
+    const industryVal = data.industry || '';
+    if (industryVal.startsWith('other: ')) {
+      properties['Industry'] = {
+        select: { name: 'Other' },
+      };
+      properties['Industry Other'] = {
+        rich_text: [{ text: { content: industryVal.replace('other: ', '') } }],
+      };
+    } else if (INDUSTRY_MAP[industryVal]) {
+      properties['Industry'] = {
+        select: { name: INDUSTRY_MAP[industryVal] },
+      };
+    }
+
+    // Communication preference
+    if (data.comm_preference) {
+      properties['Comm Preference'] = {
+        select: { name: data.comm_preference === 'whatsapp' ? 'WhatsApp' : 'Slack' },
+      };
+    }
+
+    // Social links
+    if (data.social_linkedin) {
+      properties['LinkedIn'] = { url: data.social_linkedin };
+    }
+    if (data.social_instagram) {
+      properties['Instagram'] = {
+        rich_text: [{ text: { content: data.social_instagram } }],
+      };
+    }
+    if (data.social_x) {
+      properties['X'] = {
+        rich_text: [{ text: { content: data.social_x } }],
+      };
+    }
+    if (data.social_website) {
+      properties['Website'] = { url: data.social_website };
+    }
 
     // Add photo URL if uploaded successfully
     if (photoUrl) {
